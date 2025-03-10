@@ -167,6 +167,33 @@ def merge_sort(draw_info, ascending = True):
 
         yield from merge_sort_rec(0, len(lst))
 
+def quick_sort(draw_info, ascending=True):
+    lst = draw_info.lst
+
+    def partition(low, high):
+        pivot = lst[high]  # Last element as pivot
+        i = low - 1  # Pointer for the smaller element
+
+        for j in range(low, high):
+            if (lst[j] < pivot and ascending) or (lst[j] > pivot and not ascending):
+                i += 1
+                lst[i], lst[j] = lst[j], lst[i]
+                draw_list(draw_info, {i: draw_info.GREEN, j: draw_info.RED}, True)
+                yield True
+
+        lst[i + 1], lst[high] = lst[high], lst[i + 1]  # Swap pivot to the correct position
+        draw_list(draw_info, {i + 1: draw_info.GREEN, high: draw_info.RED}, True)
+        yield True
+        return i + 1  # Return pivot index
+
+    def quick_sort_rec(low, high):
+        if low < high:
+            pivot_index = yield from partition(low, high)
+            yield from quick_sort_rec(low, pivot_index - 1)  #left
+            yield from quick_sort_rec(pivot_index + 1, high)  #right
+
+    yield from quick_sort_rec(0, len(lst) - 1)
+
 
 def main():
     run = True
@@ -234,6 +261,9 @@ def main():
                 sorting_algorithm = merge_sort
                 sorting_algo_name = "Merge Sort"
                 
+            elif event.key == pygame.K_q and sorting == False:
+                sorting_algorithm = quick_sort
+                sorting_algo_name = "Quick Sort"
 
     pygame.quit()
 
